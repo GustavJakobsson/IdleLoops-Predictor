@@ -200,15 +200,17 @@ const Koviko = {
      */
     exp(a, s, t) {
       Koviko.globals.statList.forEach(i => {
-        if (i in a.stats && i in s) {
-          let expToAdd=a.stats[i] * a.expMult * (this.baseManaCost(a) / this.ticks()) * this.getTotalBonusXP(i,t);
-        if (i == "Dex" || i == "Con" || i == "Spd" || i == "Per") {
-            expToAdd *= Math.pow(1.10, getBuffLevel("PrestigePhysical"))
-        }
+        if (i in s) {
+	if(i in a.stats){
+		  let expToAdd=a.stats[i] * a.expMult * (this.baseManaCost(a) / this.ticks()) * this.getTotalBonusXP(i,t);
+		if (i == "Dex" || i == "Con" || i == "Spd" || i == "Per") {
+		    expToAdd *= Math.pow(1.10, getBuffLevel("PrestigePhysical"))
+		}
 
-        if (i == "Cha" || i == "Int" || i == "Soul") {
-            expToAdd *= Math.pow(1.10, getBuffLevel("PrestigeMental"))
-        }
+		if (i == "Cha" || i == "Int" || i == "Soul") {
+		    expToAdd *= Math.pow(1.10, getBuffLevel("PrestigeMental"))
+		}
+	}
 
 
 
