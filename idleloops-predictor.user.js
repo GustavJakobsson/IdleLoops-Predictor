@@ -205,11 +205,11 @@ const Koviko = {
 	if(i in a.stats){
 		   expToAdd=a.stats[i] * a.expMult * (this.baseManaCost(a) / this.ticks()) * this.getTotalBonusXP(i,t);
 		if (i == "Dex" || i == "Con" || i == "Spd" || i == "Per") {
-		    expToAdd *= Math.pow(1.10, getBuffLevel("PrestigePhysical"))
+		    expToAdd *= Math.pow(1.20, getBuffLevel("PrestigePhysical"))
 		}
 
 		if (i == "Cha" || i == "Int" || i == "Soul") {
-		    expToAdd *= Math.pow(1.10, getBuffLevel("PrestigeMental"))
+		    expToAdd *= Math.pow(1.20, getBuffLevel("PrestigeMental"))
 		}
 	}
 
