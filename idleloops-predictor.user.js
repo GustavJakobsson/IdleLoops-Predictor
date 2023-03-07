@@ -2,7 +2,7 @@
 // @name         IdleLoops Predictor Makro, waylonj prestige
 // @namespace    https://github.com/GustavJakobsson/
 // @downloadURL  https://raw.githubusercontent.com/GustavJakobsson/IdleLoops-Predictor/master/idleloops-predictor.user.js
-// @version      0.3
+// @version      0.3.1
 // @description  Predicts the amount of resources spent and gained by each action in the action list. Valid as of IdleLoops v.2.9/lloyd.
 // @author       Koviko <koviko.net@gmail.com>
 // @match        https://waylonj.github.io/omsi-loops.github.io/
@@ -205,18 +205,18 @@ const Koviko = {
 	if(i in a.stats){
 		   expToAdd=a.stats[i] * a.expMult * (this.baseManaCost(a) / this.ticks()) * this.getTotalBonusXP(i,t);
 		if (i == "Dex" || i == "Con" || i == "Spd" || i == "Per") {
-		    expToAdd *= Math.pow(1.20, getBuffLevel("PrestigePhysical"))
+		    expToAdd *= Math.pow(PRESTIGE_PHYSICAL_BASE, getBuffLevel("PrestigePhysical"))
 		}
 
 		if (i == "Cha" || i == "Int" || i == "Soul") {
-		    expToAdd *= Math.pow(1.20, getBuffLevel("PrestigeMental"))
+		    expToAdd *= Math.pow(PRESTIGE_MENTAL_BASE, getBuffLevel("PrestigeMental"))
 		}
 	}
 
 
 
 
-          expToAdd += a.expMult * (this.baseManaCost(a) / this.ticks()) * this.getTotalBonusXP(i,t) * (Math.pow(1.00222, getBuffLevel("PrestigeExpOverflow")) - 1);
+          expToAdd += a.expMult * (this.baseManaCost(a) / this.ticks()) * this.getTotalBonusXP(i,t) * (Math.pow(PRESTIGE_EXP_OVERFLOW_BASE, getBuffLevel("PrestigeExpOverflow")) - 1);
 
 
           s[i] += expToAdd;
@@ -718,11 +718,11 @@ const Koviko = {
          * @return {number} Combat skill of the team leader
          * @memberof Koviko.Predictor#helpers
          */
-        getSelfCombat: (r, k) => ( getSkillLevelFromExp(k.combat) +  getSkillLevelFromExp(k.pyromancy) * 5) * h.getArmorLevel(r,k) * (1 + getBuffLevel("Feast") * 0.05) * Math.pow(1.20, getBuffLevel("PrestigeCombat")),
+        getSelfCombat: (r, k) => ( getSkillLevelFromExp(k.combat) +  getSkillLevelFromExp(k.pyromancy) * 5) * h.getArmorLevel(r,k) * (1 + getBuffLevel("Feast") * 0.05) * Math.pow(PRESTIGE_COMBAT_BASE, getBuffLevel("PrestigeCombat")),
 
-        getZombieStrength: (r, k) => (( getSkillLevelFromExp(k.dark) * (r.zombie||0) / 2 * Math.max(getBuffLevel("Ritual") / 100, 1)) * (1 + getBuffLevel("Feast") * 0.05)) * Math.pow(1.20, getBuffLevel("PrestigeCombat")),
+        getZombieStrength: (r, k) => (( getSkillLevelFromExp(k.dark) * (r.zombie||0) / 2 * Math.max(getBuffLevel("Ritual") / 100, 1)) * (1 + getBuffLevel("Feast") * 0.05)) * Math.pow(PRESTIGE_COMBAT_BASE, getBuffLevel("PrestigeCombat")),
 
-        getTeamStrength: (r, k) => (( getSkillLevelFromExp(k.combat) +  getSkillLevelFromExp(k.restoration) * 4) * ((r.team||0) / 2) * (r.adventures?h.getGuildRankBonus(r.adventures):1) * h.getSkillBonusInc(k.leadership))  * (1 + getBuffLevel("Feast") * 0.05) * Math.pow(1.20, getBuffLevel("PrestigeCombat")),
+        getTeamStrength: (r, k) => (( getSkillLevelFromExp(k.combat) +  getSkillLevelFromExp(k.restoration) * 4) * ((r.team||0) / 2) * (r.adventures?h.getGuildRankBonus(r.adventures):1) * h.getSkillBonusInc(k.leadership))  * (1 + getBuffLevel("Feast") * 0.05) * Math.pow(PRESTIGE_COMBAT_BASE, getBuffLevel("PrestigeCombat")),
 
         getTeamCombat: (r, k) => (h.getSelfCombat(r, k) + h.getZombieStrength(r, k) + h.getTeamStrength(r, k)),
 
