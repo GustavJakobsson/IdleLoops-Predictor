@@ -2,7 +2,7 @@
 // @name         IdleLoops Predictor Makro, waylonj prestige
 // @namespace    https://github.com/GustavJakobsson/
 // @downloadURL  https://raw.githubusercontent.com/GustavJakobsson/IdleLoops-Predictor/master/idleloops-predictor.user.js
-// @version      0.2
+// @version      0.3
 // @description  Predicts the amount of resources spent and gained by each action in the action list. Valid as of IdleLoops v.2.9/lloyd.
 // @author       Koviko <koviko.net@gmail.com>
 // @match        https://waylonj.github.io/omsi-loops.github.io/
@@ -718,11 +718,11 @@ const Koviko = {
          * @return {number} Combat skill of the team leader
          * @memberof Koviko.Predictor#helpers
          */
-        getSelfCombat: (r, k) => ( getSkillLevelFromExp(k.combat) +  getSkillLevelFromExp(k.pyromancy) * 5) * h.getArmorLevel(r,k) * (1 + getBuffLevel("Feast") * 0.05) * Math.pow(1.10, getBuffLevel("PrestigeCombat")),
+        getSelfCombat: (r, k) => ( getSkillLevelFromExp(k.combat) +  getSkillLevelFromExp(k.pyromancy) * 5) * h.getArmorLevel(r,k) * (1 + getBuffLevel("Feast") * 0.05) * Math.pow(1.20, getBuffLevel("PrestigeCombat")),
 
-        getZombieStrength: (r, k) => (( getSkillLevelFromExp(k.dark) * (r.zombie||0) / 2 * Math.max(getBuffLevel("Ritual") / 100, 1)) * (1 + getBuffLevel("Feast") * 0.05)) * Math.pow(1.10, getBuffLevel("PrestigeCombat")),
+        getZombieStrength: (r, k) => (( getSkillLevelFromExp(k.dark) * (r.zombie||0) / 2 * Math.max(getBuffLevel("Ritual") / 100, 1)) * (1 + getBuffLevel("Feast") * 0.05)) * Math.pow(1.20, getBuffLevel("PrestigeCombat")),
 
-        getTeamStrength: (r, k) => (( getSkillLevelFromExp(k.combat) +  getSkillLevelFromExp(k.restoration) * 4) * ((r.team||0) / 2) * (r.adventures?h.getGuildRankBonus(r.adventures):1) * h.getSkillBonusInc(k.leadership))  * (1 + getBuffLevel("Feast") * 0.05) * Math.pow(1.10, getBuffLevel("PrestigeCombat")),
+        getTeamStrength: (r, k) => (( getSkillLevelFromExp(k.combat) +  getSkillLevelFromExp(k.restoration) * 4) * ((r.team||0) / 2) * (r.adventures?h.getGuildRankBonus(r.adventures):1) * h.getSkillBonusInc(k.leadership))  * (1 + getBuffLevel("Feast") * 0.05) * Math.pow(1.20, getBuffLevel("PrestigeCombat")),
 
         getTeamCombat: (r, k) => (h.getSelfCombat(r, k) + h.getZombieStrength(r, k) + h.getTeamStrength(r, k)),
 
