@@ -2,7 +2,7 @@
 // @name         IdleLoops Predictor Makro, waylonj prestige
 // @namespace    https://github.com/GustavJakobsson/
 // @downloadURL  https://raw.githubusercontent.com/GustavJakobsson/IdleLoops-Predictor/master/idleloops-predictor.user.js
-// @version      0.3.1
+// @version      0.1.3
 // @description  Predicts the amount of resources spent and gained by each action in the action list. Valid as of IdleLoops v.2.9/lloyd.
 // @author       Koviko <koviko.net@gmail.com>
 // @match        https://waylonj.github.io/omsi-loops.github.io/
@@ -201,22 +201,8 @@ const Koviko = {
     exp(a, s, t) {
       Koviko.globals.statList.forEach(i => {
         if (i in s) {
-	let expToAdd=0
-	if(i in a.stats){
-		   expToAdd=a.stats[i] * a.expMult * (this.baseManaCost(a) / this.ticks()) * this.getTotalBonusXP(i,t);
-		if (i == "Dex" || i == "Con" || i == "Spd" || i == "Per") {
-		    expToAdd *= Math.pow(PRESTIGE_PHYSICAL_BASE, getBuffLevel("PrestigePhysical"))
-		}
-
-		if (i == "Cha" || i == "Int" || i == "Soul") {
-		    expToAdd *= Math.pow(PRESTIGE_MENTAL_BASE, getBuffLevel("PrestigeMental"))
-		}
-	}
-
-
-
-
-          expToAdd += a.expMult * (this.baseManaCost(a) / this.ticks()) * this.getTotalBonusXP(i,t) * (Math.pow(PRESTIGE_EXP_OVERFLOW_BASE, getBuffLevel("PrestigeExpOverflow")) - 1);
+           const overFlow=Math.pow(PRESTIGE_EXP_OVERFLOW_BASE, getBuffLevel("PrestigeExpOverflow")) - 1
+           expToAdd=((a.stats[i]??0)+overFlow) * a.expMult * (this.baseManaCost(a) / this.ticks()) * this.getTotalBonusXP(i,t);
 
 
           s[i] += expToAdd;
@@ -228,7 +214,16 @@ const Koviko = {
 
     getTotalBonusXP(statName,t) {
       const soulstoneBonus = stats[statName].soulstone ? calcSoulstoneMult(stats[statName].soulstone) : 1;
-      return soulstoneBonus * (1 + Math.pow(getLevelFromTalent(t[statName]), 0.4) / 3);
+
+        var statBonus=1
+        if (["Dex","Str","Con","Spd","Per"].includes(statName)) {
+            statBonus *= Math.pow(PRESTIGE_PHYSICAL_BASE, getBuffLevel("PrestigePhysical"))
+        }
+        if (["Cha","Int","Luck","Soul"].includes(statName)) {
+            statBonus *= Math.pow(PRESTIGE_MENTAL_BASE, getBuffLevel("PrestigeMental"))
+        }
+
+      return statbonus * soulstoneBonus * (1 + Math.pow(getLevelFromTalent(t[statName]), 0.4) / 3);
     }
 
   },
