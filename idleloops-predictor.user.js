@@ -2,7 +2,7 @@
 // @name         IdleLoops Predictor Makro, waylonj prestige
 // @namespace    https://github.com/GustavJakobsson/
 // @downloadURL  https://raw.githubusercontent.com/GustavJakobsson/IdleLoops-Predictor/master/idleloops-predictor.user.js
-// @version      1.1.3.1
+// @version      1.1.3.2
 // @description  Predicts the amount of resources spent and gained by each action in the action list. Valid as of IdleLoops v.2.9/lloyd.
 // @author       Koviko <koviko.net@gmail.com>
 // @match        https://waylonj.github.io/omsi-loops.github.io/
@@ -201,6 +201,7 @@ const Koviko = {
     exp(a, s, t) {
       Koviko.globals.statList.forEach(i => {
         if (i in s) {
+	   var expToAdd=0;
            const overFlow=Math.pow(PRESTIGE_EXP_OVERFLOW_BASE, getBuffLevel("PrestigeExpOverflow")) - 1
            expToAdd=((a.stats[i]??0)+overFlow) * a.expMult * (this.baseManaCost(a) / this.ticks()) * this.getTotalBonusXP(i,t);
 	   
