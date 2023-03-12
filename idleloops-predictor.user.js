@@ -2,7 +2,7 @@
 // @name         IdleLoops Predictor Makro, waylonj prestige
 // @namespace    https://github.com/GustavJakobsson/
 // @downloadURL  https://raw.githubusercontent.com/GustavJakobsson/IdleLoops-Predictor/master/idleloops-predictor.user.js
-// @version      1.1.3
+// @version      1.1.3.1
 // @description  Predicts the amount of resources spent and gained by each action in the action list. Valid as of IdleLoops v.2.9/lloyd.
 // @author       Koviko <koviko.net@gmail.com>
 // @match        https://waylonj.github.io/omsi-loops.github.io/
@@ -222,7 +222,7 @@ const Koviko = {
             statBonus *= Math.pow(PRESTIGE_MENTAL_BASE, getBuffLevel("PrestigeMental"))
         }
 
-      return statbonus * soulstoneBonus * (1 + Math.pow(getLevelFromTalent(t[statName]), 0.4) / 3);
+      return statBonus * soulstoneBonus * (1 + Math.pow(getLevelFromTalent(t[statName]), 0.4) / 3);
     }
 
   },
