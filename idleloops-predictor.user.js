@@ -2,13 +2,12 @@
 // @name         IdleLoops Predictor Makro, waylonj prestige
 // @namespace    https://github.com/GustavJakobsson/
 // @downloadURL  https://raw.githubusercontent.com/GustavJakobsson/IdleLoops-Predictor/master/idleloops-predictor.user.js
-// @version      1.2
+// @version      1.2.1
 // @description  Predicts the amount of resources spent and gained by each action in the action list. Valid as of IdleLoops v.2.9/lloyd.
 // @author       Koviko <koviko.net@gmail.com>
 // @match        https://waylonj.github.io/omsi-loops.github.io/
 // @run-at       document-idle
 // ==/UserScript==
-window.eval(`
 /** @namespace \`*/
 const Koviko = {
   /**
@@ -1186,7 +1185,13 @@ const Koviko = {
 
             return attempt < 1 ? ( getSkillLevelFromExp(k.magic) * h.getStatProgress(p, a, s, offset)) : 0;
           },
-          effect:{loop:(r) => r.body++}
+          effect:{loop:(r,k,ss,t) => {
+          r.body++
+
+            for (const stat in stats) {
+            t[stat] = getExpOfLevel(getLevelFromExp(t[stat]) - getBuffLevel("Imbuement2") - 1);
+        }
+          }}
         }},
         'Face Judgement':{ affected:[''],
           effect:(r) =>(r.town = r.rep>=50?4:(r.rep<=-50?5:3))},
@@ -2267,7 +2272,7 @@ const Koviko = {
 
             // Apply the effect from the completion of a loop
             if (prediction.loop.effect.loop) {
-              prediction.loop.effect.loop(state.resources, state.skills,state.soulstones);
+              prediction.loop.effect.loop(state.resources, state.skills,state.soulstones,state.talents);
             }
 
             // Store remaining progress in next loop if next loop is allowed
