@@ -2,7 +2,7 @@
 // @name         IdleLoops Predictor Makro, waylonj prestige
 // @namespace    https://github.com/GustavJakobsson/
 // @downloadURL  https://raw.githubusercontent.com/GustavJakobsson/IdleLoops-Predictor/master/idleloops-predictor.user.js
-// @version      1.1.3.2
+// @version      1.2
 // @description  Predicts the amount of resources spent and gained by each action in the action list. Valid as of IdleLoops v.2.9/lloyd.
 // @author       Koviko <koviko.net@gmail.com>
 // @match        https://waylonj.github.io/omsi-loops.github.io/
@@ -198,13 +198,13 @@ const Koviko = {
      * @param {Koviko.Predictor~Stats} s Accumulated stat experience
      * @memberof Koviko.Prediction
      */
-    exp(a, s, t) {
+    exp(a, s, t, ss) {
       Koviko.globals.statList.forEach(i => {
         if (i in s) {
 	   var expToAdd=0;
            const overFlow=Math.pow(PRESTIGE_EXP_OVERFLOW_BASE, getBuffLevel("PrestigeExpOverflow")) - 1
-           expToAdd=((a.stats[i]??0)+overFlow) * a.expMult * (this.baseManaCost(a) / this.ticks()) * this.getTotalBonusXP(i,t);
-	   
+           expToAdd=((a.stats[i]??0)+overFlow) * a.expMult * (this.baseManaCost(a) / this.ticks()) * this.getTotalBonusXP(i,t,ss);
+
           s[i] += expToAdd;
           let talentGain = expToAdd*(getSkillBonus("Wunderkind") + getBuffLevel("Aspirant") * 0.01) / 100;
           t[i] += talentGain;
@@ -212,8 +212,8 @@ const Koviko = {
       });
     }
 
-    getTotalBonusXP(statName,t) {
-      const soulstoneBonus = stats[statName].soulstone ? calcSoulstoneMult(stats[statName].soulstone) : 1;
+    getTotalBonusXP(statName,t,ss) {
+      const soulstoneBonus = ss[statName] ? calcSoulstoneMult(ss[statName]) : 1;
 
         var statBonus=1
         if (["Dex","Str","Con","Spd","Per"].includes(statName)) {
@@ -227,7 +227,22 @@ const Koviko = {
     }
 
   },
-
+ SacrificeSoulstones(amount,ss) {
+    while (amount > 0)
+    {
+        let highestSoulstoneStat = "";
+        let highestSoulstone = -1;
+        for (const stat in stats) {
+            if (ss[stat] > highestSoulstone) {
+                highestSoulstoneStat = stat;
+                highestSoulstone = ss[stat];
+            }
+        }
+        //console.log("Subtracting " + Math.ceil(amount/9) + " soulstones from " + highestSoulstoneStat + ". Old total: " + stats[highestSoulstoneStat].soulstone + ". New Total: " + (stats[highestSoulstoneStat].soulstone - Math.ceil(amount/9)));
+        ss[highestSoulstoneStat] -= Math.ceil(amount/9);
+        amount -= Math.ceil(amount/9);
+    }
+},
   /** A collection of attributes and a comparison of those attributes from one snapshot to the next. */
   Snapshot: class {
     /**
@@ -980,11 +995,34 @@ const Koviko = {
 
             return attempt < 1 ? ( getSkillLevelFromExp(k.dark) * h.getStatProgress(p, a, s, offset)) / (1 - towns[1].getLevel("Witch") * .005) : 0;
           },
-          effect:{loop:(r) => {
+          effect:{loop:(r,k,ss) => {
             r.ritual++;
             let ssCost = Action.DarkRitual.goldCost();
             r.nonDungeonSS -= ssCost;
             r.soul -= ssCost;
+
+            var amount=ssCost
+            //SacrificeSoulstones(ssCost,ss)
+
+
+            while (amount > 0)
+    {
+        let highestSoulstoneStat = "";
+        let highestSoulstone = -1;
+        for (const stat in stats) {
+            if (ss[stat] > highestSoulstone) {
+                highestSoulstoneStat = stat;
+                highestSoulstone = ss[stat];
+            }
+        }
+        //console.log("Subtracting " + Math.ceil(amount/9) + " soulstones from " + highestSoulstoneStat + ". Old total: " + stats[highestSoulstoneStat].soulstone + ". New Total: " + (stats[highestSoulstoneStat].soulstone - Math.ceil(amount/9)));
+        ss[highestSoulstoneStat] -= Math.ceil(amount/9);
+        amount -= Math.ceil(amount/9);
+    }
+
+
+
+
           }}
         }},
         'Continue On':{ affected:[''],
@@ -1111,11 +1149,32 @@ const Koviko = {
 
             return attempt < 1 ? ( getSkillLevelFromExp(k.magic) * h.getStatProgress(p, a, s, offset)) : 0;
           },
-          effect:{loop:(r) => {
+          effect:{loop:(r,k,ss) => {
             r.mind++;
             let ssCost = Action.ImbueMind.goldCost();
             r.nonDungeonSS -= ssCost;
             r.soul -= ssCost;
+
+                        var amount=ssCost
+            //SacrificeSoulstones(ssCost,ss)
+
+
+            while (amount > 0)
+    {
+        let highestSoulstoneStat = "";
+        let highestSoulstone = -1;
+        for (const stat in stats) {
+            if (ss[stat] > highestSoulstone) {
+                highestSoulstoneStat = stat;
+                highestSoulstone = ss[stat];
+            }
+        }
+        //console.log("Subtracting " + Math.ceil(amount/9) + " soulstones from " + highestSoulstoneStat + ". Old total: " + stats[highestSoulstoneStat].soulstone + ". New Total: " + (stats[highestSoulstoneStat].soulstone - Math.ceil(amount/9)));
+        ss[highestSoulstoneStat] -= Math.ceil(amount/9);
+        amount -= Math.ceil(amount/9);
+    }
+
+
           }}
         }},
         'Imbue Body':{ affected:['body'],
@@ -1244,11 +1303,32 @@ const Koviko = {
           tick:(p, a, s, k) => offset => {
             return  getSkillLevelFromExp(k.practical) * h.getStatProgress(p, a, s, offset);
           },
-          effect:{loop:(r) => {
+          effect:{loop:(r,k,ss) => {
             r.feast++;
             let ssCost = Action.GreatFeast.goldCost();
             r.nonDungeonSS -= ssCost;
             r.soul -= ssCost;
+
+                        var amount=ssCost
+            //SacrificeSoulstones(ssCost,ss)
+
+
+            while (amount > 0)
+    {
+        let highestSoulstoneStat = "";
+        let highestSoulstone = -1;
+        for (const stat in stats) {
+            if (ss[stat] > highestSoulstone) {
+                highestSoulstoneStat = stat;
+                highestSoulstone = ss[stat];
+            }
+        }
+        //console.log("Subtracting " + Math.ceil(amount/9) + " soulstones from " + highestSoulstoneStat + ". Old total: " + stats[highestSoulstoneStat].soulstone + ". New Total: " + (stats[highestSoulstoneStat].soulstone - Math.ceil(amount/9)));
+        ss[highestSoulstoneStat] -= Math.ceil(amount/9);
+        amount -= Math.ceil(amount/9);
+    }
+
+
           }}
         }},
         'Fight Frost Giants':{ affected:['giants'],
@@ -1600,7 +1680,8 @@ const Koviko = {
           talents:  Koviko.globals.statList.reduce((talents, name) => (talents[name] = stats[name].talent, talents), {}),
           skills: Object.entries(Koviko.globals.skills).reduce((skills, x) => (skills[x[0].toLowerCase()] = x[1].exp, skills), {}),
           progress: {},
-          currProgress: {}
+          currProgress: {},
+          soulstones: Koviko.globals.statList.reduce((soulstones, name) => (soulstones[name] = stats[name].soulstone, soulstones), {}),
         };
         if (Koviko.options.slowMode) {
           this.initState=structuredClone(state);
@@ -1761,10 +1842,10 @@ const Koviko = {
                 let canStart = typeof(prediction.canStart) === "function" ? prediction.canStart(state.resources) : prediction.canStart;
                 if (!canStart) { isValid = false; }
                 if ( !canStart || listedAction.disabled ) { break; }
-			
+
                 // Save the mana prior to the prediction
                 currentMana = state.resources.mana;
-			
+
                 // Skip EXP calculations for the last element, when no longer necessary (only costs 1 mana)
                 if ((i==finalIndex) && (prediction.ticks()==1) &&(!prediction.loop) &&(loop>0)) {
                   state.resources.mana--;
@@ -1774,32 +1855,32 @@ const Koviko = {
                   // Run the prediction
                   this.predict(prediction, state);
                 }
-			
+
                 // Check if the amount of mana used was too much
                 isValid = isValid && state.resources.mana >= 0;
-			
+
                 // Only for Adventure Guild
                 if ( listedAction.name == "Adventure Guild" ) {
                   state.resources.mana -= state.resources.adventures * 200;
                 }
-			
+
                 // Calculate the total amount of mana used in the prediction and add it to the total
                 total += currentMana - state.resources.mana;
-			
-			
-			
+
+
+
                 // Calculate time spent
                 let temp = (currentMana - state.resources.mana) / getSpeedMult(state.resources.town);
                 state.resources.totalTicks += temp;
                 state.resources.actionTicks+=temp;
-			
+
                 // Only for Adventure Guild
                 if ( listedAction.name == "Adventure Guild" ) {
                   state.resources.mana += state.resources.adventures * 200;
                 }
-			
+
                 if (repeatLoop&& !isValid) {break;}
-			
+
                 // Run the effect, now that the mana checks are complete
                 if (prediction.effect) {
                   prediction.effect(state.resources, state.skills);
@@ -1809,18 +1890,18 @@ const Koviko = {
                     prediction.loop.effect.end(state.resources, state.skills);
                   }
                 }
-			
+
                 // Add to cache 90% through the final action
                 if(i==finalIndex && loop === Math.floor(listedAction.loops * 0.9)){
                   let key = [listedAction.name, listedAction.disabled];
                   key['last'] = true;
                   this.cache.add(key, [state, loop + 1, total, isValid]);
                 }
-			
+
                 // Sleep every 100ms to avoid hanging the game
                 if(Date.now() % 100 === 0){
                   await new Promise(r => setTimeout(r, 1));
-			
+
                   // If id != update.id, then another update was triggered and we need to stop processing this one
                   if(id != this.update.id) {
                     return;
@@ -2123,7 +2204,7 @@ const Koviko = {
      */
     tick(prediction, state) {
       // Apply the accumulated stat experience, not for 0 Exp actions (Secret Trial & Restore Time)
-      if (prediction.action.expMult!=0) prediction.exp(prediction.action, state.stats,state.talents);
+      if (prediction.action.expMult!=0) prediction.exp(prediction.action, state.stats,state.talents,state.soulstones);
 
       // Handle the loop if it exists
       if (prediction.loop) {
@@ -2186,7 +2267,7 @@ const Koviko = {
 
             // Apply the effect from the completion of a loop
             if (prediction.loop.effect.loop) {
-              prediction.loop.effect.loop(state.resources, state.skills);
+              prediction.loop.effect.loop(state.resources, state.skills,state.soulstones);
             }
 
             // Store remaining progress in next loop if next loop is allowed
