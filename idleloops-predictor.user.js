@@ -1,8 +1,7 @@
 // ==UserScript==
 // @name         IdleLoops Predictor Makro, waylonj prestige
 // @namespace    https://github.com/GustavJakobsson/
-// @downloadURL  https://raw.githubusercontent.com/GustavJakobsson/IdleLoops-Predictor/blob/master/idleloops-predictor.user.js
-// @version      1.2.5
+// @version      1.2.6
 // @description  Predicts the amount of resources spent and gained by each action in the action list. Valid as of IdleLoops v.2.9/lloyd.
 // @author       Koviko <koviko.net@gmail.com>
 // @match        https://waylonj.github.io/omsi-loops.github.io/
