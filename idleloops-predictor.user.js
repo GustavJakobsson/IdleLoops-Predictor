@@ -2,7 +2,7 @@
 // @name         IdleLoops Predictor Makro, waylonj prestige
 // @namespace    https://github.com/GustavJakobsson/
 // @downloadURL  https://raw.githubusercontent.com/GustavJakobsson/IdleLoops-Predictor/master/idleloops-predictor.user.js
-// @version      1.2.4
+// @version      1.2.5
 // @description  Predicts the amount of resources spent and gained by each action in the action list. Valid as of IdleLoops v.2.9/lloyd.
 // @author       Koviko <koviko.net@gmail.com>
 // @match        https://waylonj.github.io/omsi-loops.github.io/
@@ -419,6 +419,10 @@ const Koviko = {
         if (Koviko.options.timePrecision !== null) {
           \$('#updateTimePrecision').val(Koviko.options.timePrecision);
         }
+        Koviko.options.NextPrecision=localStorage.getItem('NextPrecision')
+        if (Koviko.options.NextPrecision !== null) {
+          \$('#updateNextPrecision').val(Koviko.options.NextPrecision);
+        }
         Koviko.options.actionWidth=localStorage.getItem("actionWidth");
         if (Koviko.options.actionWidth!==null) {
           document.getElementById("actionsColumn").style.width=Koviko.options.actionWidth+"px";
@@ -592,6 +596,7 @@ const Koviko = {
       \$('#menu div:nth-child(4) .showthisH').append("<div id='preditorSettings'><br /><b>Predictor Settings</b></div>")
       \$('#preditorSettings').append("<br /><label>Degrees of precision on Time</label><input id='updateTimePrecision' type='number' value='1' min='0' max='10' style='width: 50px;'>");
       \$('#updateTimePrecision').focusout(function() {
+      \$(this).val(Math.floor(\$(this).val()))
           if(\$(this).val() > 10) {
               \$(this).val(10);
           }
@@ -600,6 +605,18 @@ const Koviko = {
           }
           Koviko.options.timePrecision=\$(this).val();
           localStorage.setItem('timePrecision', Koviko.options.timePrecision);
+      });
+      \$('#preditorSettings').append("<br /><label>Degrees of precision on Next</label><input id='updateNextPrecision' type='number' value='2' min='0' max='10' style='width: 50px;'>");
+      \$('#updateNextPrecision').focusout(function() {
+      \$(this).val(Math.floor(\$(this).val()))
+          if(\$(this).val() > 10) {
+              \$(this).val(10);
+          }
+          if(\$(this).val() < 1) {
+              \$(this).val(1);
+          }
+          Koviko.options.NextPrecision=\$(this).val();
+          localStorage.setItem('NextPrecision', Koviko.options.NextPrecision);
       });
       \$('#preditorSettings').append("<br /><label>Width of the Action List</label><input id='actionWidth' type='number' value='500' min='100' max='4000' style='width: 50px; margin-left:40px'>");
       \$('#actionWidth').focusout(function() {
@@ -2198,7 +2215,7 @@ const Koviko = {
         }
       }
       if (toNextLoop[currname] && toNextLoop[currname].value>0){
-          tooltip += '<tr><td><b>NEXT</b><td>' +Math.floor(toNextLoop[currname].value*10000)/100 +'%</td><td></td></tr>';
+          tooltip += '<tr><td><b>NEXT</b><td>' +Math.floor(toNextLoop[currname].value*100*Math.pow(10,Koviko.options.NextPrecision))/Math.pow(10,Koviko.options.NextPrecision) +'%</td><td></td></tr>';
       }
       //Timer
       tooltip+= '<tr><td><b>TIME</b></td><td>' + precision3(resources.totalTicks/50, 1) + '</td><td>(+' + precision3(resources.actionTicks/50, 1) + ')</td></tr>';
